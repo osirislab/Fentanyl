@@ -134,7 +134,7 @@ class Fentanyl(object):
         return self.assemble(ea, GetDisasm(ea).replace(mnem, 'jmp'))
 
     def undo(self, n=1):
-        """ Undo modification """
+        """ Undo modifications """
         data = None
         for i in range(n):
             data = self._popundo()
