@@ -108,6 +108,7 @@ class Fentanyl(object):
 
         #Write out the data
         self._addundo(ea, self._readdata(ea, len(blob)))
+        self.redo_buffer = []
         self._writedata(ea, blob)
         return success, data
 
