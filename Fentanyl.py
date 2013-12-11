@@ -16,7 +16,7 @@ Keybindings:
     Shift-J: Invert conditional jump
     Shift-P: Patch instruction
     Shift-Z: Undo modification (Won't always work. Should still be careful editting.)
-    Shift-Z: Redo modification (Won't always work. Should still be careful editting.)
+    Shift-Y: Redo modification (Won't always work. Should still be careful editting.)
 
 """
 
@@ -114,10 +114,10 @@ class Fentanyl(object):
 
     def nopout(self, ea, sz):
         """ NOP out a section of memory """
-        nsuccess, nop_instr = Assemble(ea, 'NOP')
+        nsuccess, nop_instr = Assemble(ea, 'nop')
         if not nsuccess:
             return nsuccess, nop_instr
-        return self.assemble(ea, ['NOP;'] * ((sz - ea) / len(nop_instr)))
+        return self.assemble(ea, ['nop'] * (sz / len(nop_instr)))
 
     def togglejump(self, ea):
         """ Toggle jump condition """
