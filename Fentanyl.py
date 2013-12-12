@@ -16,11 +16,12 @@ Keybindings:
     Shift-J: Invert conditional jump
     Shift-P: Patch instruction
     Shift-Z: Undo modification (Won't always work. Should still be careful editting.)
-    Shift-Z: Redo modification (Won't always work. Should still be careful editting.)
+    Shift-Y: Redo modification (Won't always work. Should still be careful editting.)
 
 """
 
 import idaapi
+import re
 
 #Generate a mapping between each set of jumps
 _JUMPS = [
@@ -41,6 +42,7 @@ _JUMPS = dict(_JUMPS + [i[::-1] for i in _JUMPS])
 
 class Fentanyl(object):
     JUMPS = _JUMPS
+    PART_RE = re.compile(r'(\W+)')
     def __init__(self):
         """ Initialize our data """
         self.undo_buffer = []
@@ -85,8 +87,16 @@ class Fentanyl(object):
         """ Write bytes to idb """
         return idaapi.patch_many_bytes(ea, blob)
 
-    def assemble(self, ea, asm, opt_nop=True):
+    def assemble(self, ea, asm, opt_fix=True, opt_nop=True):
         """ Assemble into memory """
+        #Preprocess and fixup
+        if opt_fix:
+            parts = [self.PART_RE.split(i) for i in asm]
+            asm = []
+            for i in parts:
+                op = [j if j[0] != '_' else j.replace('_', '.', 1) for j in i]
+                asm.append(''.join(op))
+
         #Assemble to a string
         success, data = Assemble(ea, asm)
         if not success:
@@ -114,10 +124,10 @@ class Fentanyl(object):
 
     def nopout(self, ea, sz):
         """ NOP out a section of memory """
-        nsuccess, nop_instr = Assemble(ea, 'NOP')
+        nsuccess, nop_instr = Assemble(ea, 'nop')
         if not nsuccess:
             return nsuccess, nop_instr
-        return self.assemble(ea, ['NOP;'] * ((sz - ea) / len(nop_instr)))
+        return self.assemble(ea, ['nop'] * (sz / len(nop_instr)))
 
     def togglejump(self, ea):
         """ Toggle jump condition """
@@ -167,7 +177,7 @@ class AssembleForm(object):
         """ Initialize form elements """
         self.ui_cntls = {
             'inp':idaapi.Form.MultiLineTextControl('', idaapi.textctrl_info_t.TXTF_FIXEDFONT),
-            'nop_chk':idaapi.Form.ChkGroupControl(('rNop', 'rUNUSED')),
+            'opt_chk':idaapi.Form.ChkGroupControl(('fixup', 'nopout')),
             'form_cb':idaapi.Form.FormChangeCb(self._form_cb),
         }
         self.ui_form = idaapi.Form("""STARTITEM {id:inp}
@@ -178,11 +188,12 @@ Fentanyl Assembler
 
 {form_cb}
 <:{inp}>
-<Fill with NOPs:{rNop}>{nop_chk}>"""
+<Name fixups:{fixup}>
+<Fill with NOPs:{nopout}>{opt_chk}>"""
         , self.ui_cntls)
         self.values = None
         self.ui_form.Compile()
-        self.ui_form.nop_chk.value = 1
+        self.ui_form.opt_chk.value = 3
 
     def __del__(self):
         """ Clean up """
@@ -192,7 +203,16 @@ Fentanyl Assembler
     def _getvalue(self, cntl):
         """ Get value of the control """
         val = self.ui_form.GetControlValue(cntl)
-        return val.value if isinstance(val, idaapi.textctrl_info_t) else val
+        if isinstance(cntl, idaapi.Form.ChkGroupControl):
+            names = cntl.children_names
+            opts = {}
+            for i in range(len(names)):
+                opts[names[i]] = val & (2**i)
+            val = opts
+        else:
+            if isinstance(cntl, idaapi.Form.MultiLineTextControl):
+                val = val.value
+        return val
 
     def _form_cb(self, fid):
         """ Handle callbacks and grab control values """
@@ -202,6 +222,7 @@ Fentanyl Assembler
         self.values = dict([
             (k, self._getvalue(v))
             for k, v in self.ui_cntls.items()
+            #Exclude the callback, it isn't a control
             if not isinstance(v, idaapi.Form.FormChangeCb)
         ])
         return True
@@ -231,7 +252,7 @@ def assemble():
 
         start, end = ftl._getpos()
         lines = [i.strip() for i in v['inp'].replace(';', '\n').split('\n')]
-        success, data = ftl.assemble(start, lines, v['nop_chk'])
+        success, data = ftl.assemble(start, lines, v['opt_chk']['fixup'], v['opt_chk']['nopout'])
 
         if not success:
             print data
