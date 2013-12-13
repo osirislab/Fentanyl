@@ -74,7 +74,7 @@ class Fentanyl(object):
     def _getpos(self):
         """ Get the selected area """
         start, end = SelStart(), SelEnd()
-        if start == 0xffffffff:
+        if start == BADADDR:
             start = ScreenEA()
             end = ScreenEA() + self._instrsize(start)
         return start, end
@@ -87,15 +87,42 @@ class Fentanyl(object):
         """ Write bytes to idb """
         return idaapi.patch_many_bytes(ea, blob)
 
+    def _getregvars(self, ea):
+        """ Return all the regvar mappings as a dict """
+        func = idaapi.get_func(ea)
+        regvars = {}
+
+        #XXX: Broken in idapython
+        #mapping = {rv.user: rv.canon for rv in func.regvars}
+
+        regs = ['eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp']
+        for r in regs:
+            rv = idaapi.find_regvar(func, ea, r)
+            if not rv: continue
+            regvars[rv.user] = rv.canon
+
+        return regvars
+
+    def _fixup(self, parts, regvars):
+        """ Fixup an instruction """
+        nparts = []
+        for i in parts:
+            if i in regvars: nparts.append(regvars[i])
+            elif i and i[0] == '_':
+                nparts.append(i.replace('_', '.', 1))
+            else: nparts.append(i)
+
+        return ''.join(nparts)
+
     def assemble(self, ea, asm, opt_fix=True, opt_nop=True):
         """ Assemble into memory """
         #Preprocess and fixup
         if opt_fix:
-            parts = [self.PART_RE.split(i) for i in asm]
+            regvars = self._getregvars(ea)
+            parts_arr = [self.PART_RE.split(i) for i in asm]
             asm = []
-            for i in parts:
-                op = [j if not j or j[0] != '_' else j.replace('_', '.', 1) for j in i]
-                asm.append(''.join(op))
+            for parts in parts_arr:
+                asm.append(self._fixup(parts, regvars))
 
         #Assemble to a string
         success, data = Assemble(ea, asm)
