@@ -94,7 +94,7 @@ class Fentanyl(object):
             parts = [self.PART_RE.split(i) for i in asm]
             asm = []
             for i in parts:
-                op = [j if j[0] != '_' else j.replace('_', '.', 1) for j in i]
+                op = [j if not j or j[0] != '_' else j.replace('_', '.', 1) for j in i]
                 asm.append(''.join(op))
 
         #Assemble to a string
