@@ -16,10 +16,10 @@ Right click bytes in hex view and click edit to begin editting.
 Right click again and select Apply Changes to save changes. 
 
 Keybindings:
-    Shift-N: Convert instructions to nops
-    Shift-J: Invert conditional jump
-    Shift-U: Make jump unconditional
-    Shift-P: Patch instruction
-    Shift-Z: Undo modification (Won't always work. Should still be careful editing.)
-    Shift-Y: Redo modification (Won't always work. Should still be careful editing.)
-    Shift-S: Save file
+    * Shift-N: Convert instructions to nops
+    * Shift-J: Invert conditional jump
+    * Shift-U: Make jump unconditional
+    * Shift-P: Patch instruction
+    * Shift-Z: Undo modification (Won't always work. Should still be careful editing.)
+    * Shift-Y: Redo modification (Won't always work. Should still be careful editing.)
+    * Shift-S: Save file
