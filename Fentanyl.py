@@ -37,6 +37,7 @@ _JUMPS = [
     ('jne', 'je'),
     ('jno', 'jo'),
 ]
+#Generate the opposite mapping as well
 _JUMPS = dict(_JUMPS + [i[::-1] for i in _JUMPS])
 
 
@@ -97,6 +98,7 @@ class Fentanyl(object):
         #XXX: Broken in idapython
         #mapping = {rv.user: rv.canon for rv in func.regvars}
 
+        #Check if each regvar exists and add it to the dict
         regs = ['eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp']
         for r in regs:
             rv = idaapi.find_regvar(func, ea, r)
@@ -109,16 +111,19 @@ class Fentanyl(object):
         """ Fixup an instruction """
         nparts = []
         for i in parts:
+            #Fixup regvars
             if i in regvars: nparts.append(regvars[i])
+            #Fixup .got.plt entries (IDA turns '.' into '_')
             elif i and i[0] == '_':
                 nparts.append(i.replace('_', '.', 1))
+            #Default case
             else: nparts.append(i)
 
         return ''.join(nparts)
 
     def assemble(self, ea, asm, opt_fix=True, opt_nop=True):
         """ Assemble into memory """
-        #Preprocess and fixup
+        #Fixup the assemble
         if opt_fix:
             regvars = self._getregvars(ea)
             parts_arr = [self.PART_RE.split(i) for i in asm]
@@ -132,9 +137,9 @@ class Fentanyl(object):
             return success, data
         blob = ''.join(data)
 
-        #If opt_nop, pad blob
+        #Pad the blob with nops
         if opt_nop:
-            nsuccess, nop_instr = Assemble(ea, 'NOP')
+            nsuccess, nop_instr = Assemble(ea, 'nop')
             if not nsuccess:
                 return nsuccess, nop_instr
 
@@ -232,6 +237,8 @@ Fentanyl Assembler
     def _getvalue(self, cntl):
         """ Get value of the control """
         val = self.ui_form.GetControlValue(cntl)
+
+        #Checkboxes get turned into a dict()
         if isinstance(cntl, idaapi.Form.ChkGroupControl):
             names = cntl.children_names
             opts = {}
@@ -239,6 +246,7 @@ Fentanyl Assembler
                 opts[names[i]] = val & (2**i)
             val = opts
         else:
+            #MultiLineText controls require an extra step to get the text
             if isinstance(cntl, idaapi.Form.MultiLineTextControl):
                 val = val.value
         return val
