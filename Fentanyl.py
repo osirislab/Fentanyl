@@ -22,6 +22,7 @@ Keybindings:
 """
 
 import idaapi
+import idc
 import re
 
 #Generate a mapping between each set of jumps
@@ -86,9 +87,9 @@ class Fentanyl(object):
 
     def _writedata(self, ea, blob, reanalyze=True):
         """ Write bytes to idb """
-        if reanalyze: MakeUnknown(ea, len(blob), 0)
+        if reanalyze: idc.MakeUnknown(ea, len(blob), 0)
         idaapi.patch_many_bytes(ea, blob)
-        if reanalyze: MakeCode(ea, 0)
+        if reanalyze: idc.MakeCode(ea, 0)
 
     def _getregvars(self, ea):
         """ Return all the regvar mappings as a dict """
