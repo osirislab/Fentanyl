@@ -32,9 +32,8 @@ try:
     from PySide import QtCore
 except ImportError:
     print "PySide unavailable, no GUI"
-    QtCore = False
-    QtGui = False
-    pass
+    QtCore = None
+    QtGui = None
 
 #Generate a mapping between each set of jumps
 _JUMPS = [
@@ -388,15 +387,8 @@ if QtCore:
     menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '' and i.actions() == []]
 
     entries = [
-        ('Nop out', nopout),
-        ('Nop out xrefs', nopxrefs),
-        ('Assemble', assemble),
-        ('Toggle jump', togglejump),
-        ('Uncond jump', uncondjump),
-    ]
-    entries = [
         ('Replace with nops - Shift + N', nopout),
-        ('Nops all Xrefs - Shift + X', nopout),
+        ('Nops all Xrefs - Shift + X', nopxrefs),
         ('Assemble - Shift + P', assemble),
         ('Toggle jump - Shift + J', togglejump),
         ('Force jump - Shift + U', uncondjump),
