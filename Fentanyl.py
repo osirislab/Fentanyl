@@ -90,7 +90,6 @@ class Fentanyl(object):
         if reanalyze: idc.MakeUnknown(ea, len(blob), 0)
         idaapi.patch_many_bytes(ea, blob)
         if reanalyze: idc.MakeCode(ea)
-        print "FUU"
 
     def _getregvars(self, ea):
         """ Return all the regvar mappings as a dict """
