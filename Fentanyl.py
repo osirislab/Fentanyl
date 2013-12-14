@@ -14,6 +14,7 @@ Edit > Patch program > Apply patches to input file
 Keybindings:
     Shift-N: Convert instruction to nops
     Shift-J: Invert conditional jump
+    Shift-U: Make jump unconditional
     Shift-P: Patch instruction
     Shift-Z: Undo modification (Won't always work. Should still be careful editing.)
     Shift-Y: Redo modification (Won't always work. Should still be careful editing.)
@@ -160,14 +161,14 @@ class Fentanyl(object):
         inst = DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
         if mnem not in self.JUMPS: return False
-        return self.assemble(ea, GetDisasm(ea).replace(mnem, self.JUMPS[mnem]))
+        return self.assemble(ea, [GetDisasm(ea).replace(mnem, self.JUMPS[mnem])])
 
     def uncondjump(self, ea):
         """ Make a jump unconditional """
         inst = DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
         if mnem not in self.JUMPS: return False
-        return self.assemble(ea, GetDisasm(ea).replace(mnem, 'jmp'))
+        return self.assemble(ea, [GetDisasm(ea).replace(mnem, 'jmp')])
 
     def undo(self, n=1):
         """ Undo modifications """
@@ -287,6 +288,10 @@ def togglejump():
     start, end = ftl._getpos()
     ftl.togglejump(start)    
 
+def uncondjump():
+    start, end = ftl._getpos()
+    ftl.uncondjump(start)    
+
 def undo():
     if ftl.undo() is None:
         print "Nothing to undo"
@@ -299,6 +304,7 @@ def redo():
 idaapi.add_hotkey("Shift-N", nopout)
 idaapi.add_hotkey("Shift-P", assemble)
 idaapi.add_hotkey("Shift-J", togglejump)
+idaapi.add_hotkey("Shift-U", uncondjump)
 idaapi.add_hotkey("Shift-Z", undo)
 idaapi.add_hotkey("Shift-Y", redo)
 
