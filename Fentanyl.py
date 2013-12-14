@@ -15,8 +15,8 @@ Keybindings:
     Shift-N: Convert instruction to nops
     Shift-J: Invert conditional jump
     Shift-P: Patch instruction
-    Shift-Z: Undo modification (Won't always work. Should still be careful editting.)
-    Shift-Y: Redo modification (Won't always work. Should still be careful editting.)
+    Shift-Z: Undo modification (Won't always work. Should still be careful editing.)
+    Shift-Y: Redo modification (Won't always work. Should still be careful editing.)
 
 """
 
@@ -35,7 +35,6 @@ _JUMPS = [
     ('jnc', 'jc'),
     ('jne', 'je'),
     ('jno', 'jo'),
-    ('jbe', 'jnb'),
 ]
 _JUMPS = dict(_JUMPS + [i[::-1] for i in _JUMPS])
 
