@@ -162,6 +162,11 @@ class Fentanyl(object):
             return success, data
         blob = ''.join(data)
 
+        if len(blob) > self._instrsize(ea):
+            if idaapi.askyn_c(0, "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
+                return
+
+
         #Pad the blob with nops
         if opt_nop:
             nsuccess, nop_instr = Assemble(ea, 'nop')
