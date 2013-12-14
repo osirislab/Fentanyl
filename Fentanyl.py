@@ -22,6 +22,7 @@ Keybindings:
 """
 
 import idaapi
+import idautils
 import idc
 import re
 
@@ -53,13 +54,13 @@ class Fentanyl(object):
         self.undo_buffer = []
         self.redo_buffer = []
 
-    def _addundo(self, ea, state):
+    def _pushundo(self, entries):
         """ Insert one state into the undo stack """
-        self.undo_buffer.append((ea, state))
+        self.undo_buffer.append(entries)
 
-    def _addredo(self, ea, state):
+    def _pushredo(self, entries):
         """ Insert one state into the redo stack """
-        self.redo_buffer.append((ea, state))
+        self.redo_buffer.append(entries)
 
     def _popundo(self):
         """ Pop one state into the undo stack """
@@ -68,6 +69,19 @@ class Fentanyl(object):
     def _popredo(self):
         """ Pop one state into the redo stack """
         return self.redo_buffer.pop() if self.redo_buffer else None
+
+    def _statedo(self, n, rd_f, wr_f):
+        for i in range(n):
+            entries = rd_f()
+            if not entries: return
+            buf = []
+            for data in entries:
+                buf.append(
+                    (data[0], self._readdata(data[0], len(data[1])))
+                )
+                self._writedata(data[0], data[1])
+            wr_f(buf)
+        return entries
 
     def _instrsize(self, ea):
         """ Get the size of the instr at ea or 1 """
@@ -125,7 +139,7 @@ class Fentanyl(object):
 
         return ''.join(nparts)
 
-    def assemble(self, ea, asm, opt_fix=True, opt_nop=True):
+    def assemble(self, ea, asm, save_state=True, opt_fix=True, opt_nop=True):
         """ Assemble into memory """
         #Fixup the assemble
         if opt_fix:
@@ -155,10 +169,14 @@ class Fentanyl(object):
             blob += nop_instr * sz_diff
 
         #Write out the data
-        self._addundo(ea, self._readdata(ea, len(blob)))
-        self.redo_buffer = []
+        old = self._readdata(ea, len(blob))
+        if save_state:
+            self._pushundo(
+                [(ea, old)]
+            )
+            self.redo_buffer = []
         self._writedata(ea, blob)
-        return success, data
+        return success, old
 
     def nopout(self, ea, sz):
         """ NOP out a section of memory """
@@ -166,6 +184,22 @@ class Fentanyl(object):
         if not nsuccess:
             return nsuccess, nop_instr
         return self.assemble(ea, ['nop'] * (sz / len(nop_instr)))
+
+    def nopxrefs(self, ea):
+        """ Nop out all xrefs to a function """
+        nsuccess, nop_instr = Assemble(ea, 'nop')
+        if not nsuccess:
+            return nsuccess, nop_instr
+
+        xrefs = idautils.XrefsTo(ea)
+        buf = []
+        for i in xrefs:
+            success, old = self.assemble(i.frm, ['nop'], False)
+            if not success: continue
+
+            buf.append((ea, old))
+        self._pushundo(buf)
+        self.redo_buffer = []
 
     def togglejump(self, ea):
         """ Toggle jump condition """
@@ -183,26 +217,11 @@ class Fentanyl(object):
 
     def undo(self, n=1):
         """ Undo modifications """
-        data = None
-        for i in range(n):
-            data = self._popundo()
-            if not data: return
-            self._addredo(data[0], self._readdata(data[0], len(data[1])))
-            self._writedata(data[0], data[1])
-            #XXX: ALT IMPLEMENTATION
-            #for i in range(len(data[1])):
-            #    idaapi.put_byte(data[0] + i, idaapi.get_original_byte(data[0] + i))
-        return data
+        return self._statedo(n, self._popundo, self._pushredo);
 
     def redo(self, n=1):
         """ Redo modifications """
-        data = None
-        for i in range(n):
-            data = self._popredo()
-            if not data: return
-            self._addundo(data[0], self._readdata(data[0], len(data[1])))
-            self._writedata(data[0], data[1])
-        return data
+        return self._statedo(n, self._popredo, self._pushundo);
 
     def clear(self):
         """ Clear our state """
@@ -300,11 +319,17 @@ def assemble():
 
 def togglejump():
     start, end = ftl._getpos()
-    ftl.togglejump(start)    
+    ftl.togglejump(start)
 
 def uncondjump():
     start, end = ftl._getpos()
-    ftl.uncondjump(start)    
+    ftl.uncondjump(start)
+
+def nopxrefs():
+    start, end = ftl._getpos()
+    func = idaapi.get_func(start)
+    if func:
+        ftl.nopxrefs(func.startEA)
 
 def undo():
     if ftl.undo() is None:
@@ -336,6 +361,7 @@ def savefile():
 
 #Register hotkeys
 idaapi.add_hotkey("Shift-N", nopout)
+idaapi.add_hotkey("Shift-X", nopxrefs)
 idaapi.add_hotkey("Shift-P", assemble)
 idaapi.add_hotkey("Shift-J", togglejump)
 idaapi.add_hotkey("Shift-U", uncondjump)
@@ -346,16 +372,17 @@ idaapi.add_hotkey("Shift-S", savefile)
 #Register menu items
 qta = QtCore.QCoreApplication.instance()
 #XXX: This filter is too wide...
-menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '']
+menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '' and i.actions() == []]
 
 entries = [
     ('Nop out', nopout),
+    ('Nop out xrefs', nopxrefs),
     ('Assemble', assemble),
     ('Toggle jump', togglejump),
     ('Uncond jump', uncondjump),
 ]
 
-
+#Insert each entry into the context menu
 for i in menus:
     i.addSeparator()
 
