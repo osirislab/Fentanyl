@@ -300,6 +300,26 @@ def redo():
     if ftl.redo() is None:
         print "Nothing to redo"
 
+def savefile():
+    output_file = AskFile(1, "*", "Output File")
+    idc.GenerateFile(idaapi.OFILE_DIF, output_file, 0, MaxEA(), 0)
+    diff_file = open(output_file, "rb").read()
+    orig_file = open(idc.GetInputFilePath(), "rb").read()
+
+    diff_file = diff_file.split("\n")
+    for line in diff_file:
+        match = re.match("([A-F0-9]+): ([A-F0-9]+) ([A-F0-9]+)", line)
+        if match:
+            groups = match.groups()
+            if orig_file[int(groups[0], 16)] == groups[1].decode('hex'):
+                orig_file = orig_file[:int(groups[0], 16)] + groups[2].decode('hex') + orig_file[int(groups[0], 16)+1:]
+            else:
+                print "Error matching %02x at offset %x..." % (groups[1], groups[0])
+
+    new_file = open(output_file, 'wb')
+    new_file.write(orig_file)
+    new_file.close()
+
 #Register hotkeys
 idaapi.add_hotkey("Shift-N", nopout)
 idaapi.add_hotkey("Shift-P", assemble)
