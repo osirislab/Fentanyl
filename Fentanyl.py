@@ -13,6 +13,7 @@ Edit > Patch program > Apply patches to input file
 
 Keybindings:
     Shift-N: Convert instruction to nops
+    Shift-X: Nop all xrefs to this function
     Shift-J: Invert conditional jump
     Shift-U: Make jump unconditional
     Shift-P: Patch instruction
@@ -26,8 +27,12 @@ import idautils
 import idc
 import re
 
-from PySide import QtGui
-from PySide import QtCore
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except ImportError:
+    print "PySide unavailable, no GUI"
+    pass
 
 #Generate a mapping between each set of jumps
 _JUMPS = [
@@ -370,24 +375,32 @@ idaapi.add_hotkey("Shift-Y", redo)
 idaapi.add_hotkey("Shift-S", savefile)
 
 #Register menu items
-qta = QtCore.QCoreApplication.instance()
-#XXX: This filter is too wide...
-menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '' and i.actions() == []]
+if QtCore:
+    qta = QtCore.QCoreApplication.instance()
+    #XXX: This filter is too wide...
+    menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '' and i.actions() == []]
 
-entries = [
-    ('Nop out', nopout),
-    ('Nop out xrefs', nopxrefs),
-    ('Assemble', assemble),
-    ('Toggle jump', togglejump),
-    ('Uncond jump', uncondjump),
-]
+    entries = [
+        ('Nop out', nopout),
+        ('Nop out xrefs', nopxrefs),
+        ('Assemble', assemble),
+        ('Toggle jump', togglejump),
+        ('Uncond jump', uncondjump),
+    ]
+    entries = [
+        ('Replace with nops - Shift + N', nopout),
+        ('Nops all Xrefs - Shift + X', nopout),
+        ('Assemble - Shift + P', assemble),
+        ('Toggle jump - Shift + J', togglejump),
+        ('Force jump - Shift + U', uncondjump),
+    ]
 
-#Insert each entry into the context menu
-for i in menus:
-    i.addSeparator()
+    #Insert each entry into the context menu
+    for i in menus:
+        i.addSeparator()
 
-    for name, func in entries:
-        act = QtGui.QAction(name, qta)
-        act.triggered.connect(func)
+        for name, func in entries:
+            act = QtGui.QAction(name, qta)
+            act.triggered.connect(func)
 
-        i.addAction(act)
+            i.addAction(act)
