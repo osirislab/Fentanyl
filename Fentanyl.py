@@ -25,8 +25,12 @@ import idaapi
 import idc
 import re
 
-from PySide import QtGui
-from PySide import QtCore
+try:
+    from PySide import QtGui
+    from PySide import QtCore
+except ImportError:
+    print "PySide unavailable, no GUI"
+    pass
 
 #Generate a mapping between each set of jumps
 _JUMPS = [
@@ -343,24 +347,25 @@ idaapi.add_hotkey("Shift-Z", undo)
 idaapi.add_hotkey("Shift-Y", redo)
 idaapi.add_hotkey("Shift-S", savefile)
 
+if QtCore:
 #Register menu items
-qta = QtCore.QCoreApplication.instance()
-#XXX: This filter is too wide...
-menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '']
+    qta = QtCore.QCoreApplication.instance()
+    #XXX: This filter is too wide...
+    menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '']
 
-entries = [
-    ('Nop out', nopout),
-    ('Assemble', assemble),
-    ('Toggle jump', togglejump),
-    ('Uncond jump', uncondjump),
-]
+    entries = [
+        ('Replace with nops - Shift + N', nopout),
+        ('Assemble - Shift + P', assemble),
+        ('Toggle jump - Shift + J', togglejump),
+        ('Force jump - Shift + U', uncondjump),
+    ]
 
 
-for i in menus:
-    i.addSeparator()
+    for i in menus:
+        i.addSeparator()
 
-    for name, func in entries:
-        act = QtGui.QAction(name, qta)
-        act.triggered.connect(func)
+        for name, func in entries:
+            act = QtGui.QAction(name, qta)
+            act.triggered.connect(func)
 
-        i.addAction(act)
+            i.addAction(act)
