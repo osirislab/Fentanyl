@@ -77,6 +77,7 @@ class Fentanyl(object):
         return self.redo_buffer.pop() if self.redo_buffer else None
 
     def _statedo(self, n, rd_f, wr_f):
+        entries = None
         for i in range(n):
             entries = rd_f()
             if not entries: return
@@ -86,7 +87,13 @@ class Fentanyl(object):
                     (data[0], self._readdata(data[0], len(data[1])))
                 )
                 self._writedata(data[0], data[1])
-            wr_f(buf)
+            #Apply to the other stack in reverse order
+            wr_f(buf[::-1])
+
+        #Jump to the first entry if an operation was performed
+        if entries:
+            idaapi.jumpto(entries[0][0])
+
         return entries
 
     def _instrsize(self, ea):
