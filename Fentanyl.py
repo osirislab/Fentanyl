@@ -83,9 +83,11 @@ class Fentanyl(object):
         """ Read bytes from idb """
         return idaapi.get_many_bytes(ea, sz)
 
-    def _writedata(self, ea, blob):
+    def _writedata(self, ea, blob, reanalyze=True):
         """ Write bytes to idb """
-        return idaapi.patch_many_bytes(ea, blob)
+        if reanalyze: MakeUnknown(ea, len(blob), 0)
+        idaapi.patch_many_bytes(ea, blob)
+        if reanalyze: MakeCode(ea, 0)
 
     def _getregvars(self, ea):
         """ Return all the regvar mappings as a dict """
