@@ -25,6 +25,9 @@ import idaapi
 import idc
 import re
 
+from PySide import QtGui
+from PySide import QtCore
+
 #Generate a mapping between each set of jumps
 _JUMPS = [
     ('jnb', 'jb'), ('jna', 'ja'),
@@ -338,3 +341,25 @@ idaapi.add_hotkey("Shift-J", togglejump)
 idaapi.add_hotkey("Shift-U", uncondjump)
 idaapi.add_hotkey("Shift-Z", undo)
 idaapi.add_hotkey("Shift-Y", redo)
+
+#Register menu items
+qta = QtCore.QCoreApplication.instance()
+#XXX: This filter is too wide...
+menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '']
+
+entries = [
+    ('Nop out', nopout),
+    ('Assemble', assemble),
+    ('Toggle jump', togglejump),
+    ('Uncond jump', uncondjump),
+]
+
+
+for i in menus:
+    i.addSeparator()
+
+    for name, func in entries:
+        act = QtGui.QAction(name, qta)
+        act.triggered.connect(func)
+
+        i.addAction(act)
