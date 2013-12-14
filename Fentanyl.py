@@ -32,6 +32,8 @@ try:
     from PySide import QtCore
 except ImportError:
     print "PySide unavailable, no GUI"
+    QtCore = False
+    QtGui = False
     pass
 
 #Generate a mapping between each set of jumps
