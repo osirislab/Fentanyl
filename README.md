@@ -3,10 +3,15 @@ Fentanyl
 
 An IDAPython script that makes patching significantly easier. Fentanyl lets you patch from IDA Pro or Demo easily. Most patches can be done without touching a hex editor but if you must edit raw bytes you can simply use IDA's hex view. You can also undo and redo changes to the idb. 
 
-For context menu options install Python 2.6, use the respective IDAPython version, and download the PySide bindings below. 
-IDAPython: https://code.google.com/p/idapython/
+For context menu options install PySide following the instructions below.
 
-IDA PySide: http://dvlabs.tippingpoint.com/img/mindshare/PySide-1.0.8qt473.win32-py2.6.exe
+IDAPython
+ 1. Download: https://code.google.com/p/idapython/
+ 2. Move appropriate folders to IDA plugins directory
+
+IDA PySide
+ 1. Download (custom built by ancat): https://drive.google.com/file/d/0ByZjdUcZD2dndng4Q1hrYWJiSUE/edit?usp=sharing
+ 2. Extract and move PySide folder to C:\python27\Lib\site-packages\
 
 Helfpul if you want to run scripts on startup: https://code.google.com/p/idapython/source/browse/trunk/examples/idapythonrc.py
 
