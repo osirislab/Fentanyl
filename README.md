@@ -13,7 +13,7 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
 
 ### IDA PySide
 
- 1. Download (custom built by ancat): Python 2.7 PySide bindings [here](https://drive.google.com/file/d/0ByZjdUcZD2dndng4Q1hrYWJiSUE/edit?usp=sharing).
+ 1. Download (custom built by ancat): Python 2.7 PySide bindings [installer](https://drive.google.com/file/d/0ByZjdUcZD2dnQkw4cHU1bmZzWE0/edit?usp=sharing) or [raw](https://drive.google.com/file/d/0ByZjdUcZD2dndng4Q1hrYWJiSUE/edit?usp=sharing).
  2. Extract and move PySide folder to `C:\python27\Lib\site-packages\`
 
 ## Usage
