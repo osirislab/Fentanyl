@@ -21,21 +21,21 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
 ### Loading Fentanyl.py
 
 1. `Alt+F7` or `File > Script File` to load scripts
-2. Browse to `Fentanyl.py` and open it
+2. Browse to `main.py` and open it
 3. That's hitlerally it!
 
 ### Key Bindings
 
 *Some of these keybindings can be accessed by right-clicking on the screen in graph view.*
 
- * `Shift-N` Convert instructions to nops
- * `Shift-X` Nop all xrefs to this function
- * `Shift-J` Invert conditional jump
- * `Shift-U` Make jump unconditional
- * `Shift-P` Patch instruction
- * `Shift-Z` Undo modification (Won't always work. Should still be careful editing.)
- * `Shift-Y` Redo modification (Won't always work. Should still be careful editing.)
- * `Shift-S` Save file
+ * `Ctrl-Shift-N` Convert instructions to nops
+ * `Ctrl-Shift-X` Nop all xrefs to this function
+ * `Ctrl-Shift-J` Invert conditional jump
+ * `Ctrl-Shift-U` Make jump unconditional
+ * `Ctrl-Shift-P` Patch instruction
+ * `Ctrl-Shift-Z` Undo modification (Won't always work. Should still be careful editing.)
+ * `Ctrl-Shift-Y` Redo modification (Won't always work. Should still be careful editing.)
+ * `Ctrl-Shift-S` Save file
 
 ## Extras
 
