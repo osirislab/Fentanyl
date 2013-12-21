@@ -196,17 +196,17 @@ class Fentanyl(object):
 
     def togglejump(self, ea):
         """ Toggle jump condition """
-        inst = DecodeInstruction(ea)
+        inst = idautils.DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
         if mnem not in self.JUMPS: return False
-        return self.assemble(ea, [GetDisasm(ea).replace(mnem, self.JUMPS[mnem])])
+        return self.assemble(ea, [idc.GetDisasm(ea).replace(mnem, self.JUMPS[mnem])])
 
     def uncondjump(self, ea):
         """ Make a jump unconditional """
-        inst = DecodeInstruction(ea)
+        inst = idautils.DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
         if mnem not in self.JUMPS: return False
-        return self.assemble(ea, [GetDisasm(ea).replace(mnem, 'jmp')])
+        return self.assemble(ea, [idc.GetDisasm(ea).replace(mnem, 'jmp')])
 
     def undo(self, n=1):
         """ Undo modifications """
