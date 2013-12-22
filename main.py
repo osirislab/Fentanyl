@@ -183,4 +183,11 @@ if QtCore:
 
 
 #Rebind on new db
-ftlh.loadfilehook(bind_ctx_menus)
+ftlh.register('LoadFile', bind_ctx_menus)
+#Rebind on new IDA View
+ftlh.register('WindowOpen', bind_ctx_menus)
+ftlh.register('GraphNewProximityView', bind_ctx_menus)
+#Rebind on new Hex View
+ftlh.register('ToggleDump', bind_ctx_menus)
+#Reset on IDB close
+ftlh.register('CloseBase', ftl.clear)

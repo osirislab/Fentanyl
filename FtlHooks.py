@@ -18,9 +18,9 @@ class FtlHooks(idaapi.UI_Hooks):
         return 0
 
     def postprocess(self):
-        if self.cmd == 'LoadFile' and 'lfh' in self.hooks:
-            self.hooks['lfh']()
+        if self.cmd in self.hooks:
+            self.hooks[self.cmd]()
         return 0
 
-    def loadfilehook(self, func):
-        self.hooks['lfh'] = func
+    def register(self, name, func):
+        self.hooks[name] = func
