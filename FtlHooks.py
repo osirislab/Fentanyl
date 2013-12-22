@@ -10,6 +10,7 @@ import idaapi
 class FtlHooks(idaapi.UI_Hooks):
     def __init__(self):
         super(FtlHooks, self).__init__()
+        self.hooks = {}
         self.cmd = None
 
     def preprocess(self, name):
@@ -17,8 +18,9 @@ class FtlHooks(idaapi.UI_Hooks):
         return 0
 
     def postprocess(self):
-        if self.cmd == 'CloseBase': pass
-        elif self.cmd == 'LoadFile': pass
-        #print("CMD> %s" % self.cmd)
+        if self.cmd == 'LoadFile' and 'lfh' in self.hooks:
+            self.hooks['lfh']()
         return 0
 
+    def loadfilehook(self, func):
+        self.hooks['lfh'] = func

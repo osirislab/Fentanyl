@@ -49,6 +49,8 @@ asf = AssembleForm.AssembleForm()
 ftlh = FtlHooks.FtlHooks()
 ftlh.hook()
 
+#XXX: Store the parents of the QWidgets. Otherwise, some get GCed.
+hack = []
 
 #Interfaces to the methods in ftl
 def nopout():
@@ -113,6 +115,39 @@ def savefile():
     new_file.close()
 
 
+#Helper functions
+
+def bind_ctx_menus():
+    #Find all the menus we need to modify
+    menus = []
+    for wid in qta.allWidgets():
+        if not isinstance(wid, QtGui.QMenu):
+            continue
+
+        parent = wid.parent()
+        if  parent.__class__ != QtGui.QWidget:
+            continue
+
+        #Find Hex/IDA Views
+        if  'Hex View' in parent.windowTitle() or \
+            len(parent.windowTitle()) == 1 \
+        :
+            hack.append(parent)
+            menus.append(wid)
+
+    #Filter out menus with actions
+    menus = [i for i in menus if not i.actions()]
+
+    print 'Bound entries to %s' % menus
+
+    #Insert each entry into the context menu
+    for i in range(len(menus)):
+        menu = menus[i]
+        menu.addSeparator()
+
+        for qact in qdata:
+            menu.addAction(qact)
+
 #Hotkey definitions
 hotkeys = [
     ('Replace with nops', True , ['Ctrl', 'Shift', 'N'], 'nopout.png', nopout),
@@ -134,8 +169,6 @@ for name, in_menu, keys, icon, func in hotkeys:
 #Register menu items
 if QtCore:
     qta = QtCore.QCoreApplication.instance()
-    #XXX: This filter is too wide...
-    menus = [i for i in qta.allWidgets() if isinstance(i, QtGui.QMenu) and i.title() == '' and i.actions() == []]
 
     qdata = []
     for name, in_menu, keys, icon, func in (i for i in hotkeys if i[1]):
@@ -146,9 +179,8 @@ if QtCore:
         qact.setShortcut(qks)
         qdata.append(qact)
 
-    #Insert each entry into the context menu
-    for i in menus:
-        i.addSeparator()
+    bind_ctx_menus()
 
-        for qact in qdata:
-            i.addAction(qact)
+
+#Rebind on new db
+ftlh.loadfilehook(bind_ctx_menus)
