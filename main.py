@@ -150,14 +150,14 @@ def bind_ctx_menus():
 
 #Hotkey definitions
 hotkeys = [
-    ('Replace with nops', True , ['Ctrl', 'Shift', 'N'], 'nopout.png', nopout),
-    ('Nops all Xrefs'   , True , ['Ctrl', 'Shift', 'X'], 'nopxrefs.png', nopxrefs),
-    ('Assemble'         , True , ['Ctrl', 'Shift', 'P'], 'assemble.png', assemble),
-    ('Toggle jump'      , True , ['Ctrl', 'Shift', 'J'], 'togglejump.png', togglejump),
-    ('Force jump'       , True , ['Ctrl', 'Shift', 'U'], 'uncondjump.png', uncondjump),
-    ('Undo Patch'       , False, ['Ctrl', 'Shift', 'Z'], None, undo),
-    ('Redo Patch'       , False, ['Ctrl', 'Shift', 'Y'], None, redo),
-    ('Save File'        , False, ['Ctrl', 'Shift', 'S'], None, savefile)
+    ('Replace with nops', True , ['Alt', 'N'], 'nopout.png', nopout),
+    ('Nops all Xrefs'   , True , ['Alt', 'X'], 'nopxrefs.png', nopxrefs),
+    ('Assemble'         , True , ['Alt', 'P'], 'assemble.png', assemble),
+    ('Toggle jump'      , True , ['Alt', 'J'], 'togglejump.png', togglejump),
+    ('Force jump'       , True , ['Alt', 'U'], 'uncondjump.png', uncondjump),
+    ('Undo Patch'       , False, ['Alt', 'Z'], None, undo),
+    ('Redo Patch'       , False, ['Alt', 'Y'], None, redo),
+    ('Save File'        , False, ['Alt', 'S'], None, savefile)
 ]
 
 
