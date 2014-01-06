@@ -30,6 +30,7 @@ import re
 import Fentanyl
 import AssembleForm
 import FtlHooks
+import CodeCaveFinder
 
 try:
     from PySide import QtGui
@@ -114,6 +115,9 @@ def savefile():
     new_file.write(orig_file)
     new_file.close()
 
+def openspelunky():
+    window = CodeCaveFinder.CodeCaveWindow()
+    window.Show("Spelunky")
 
 #Helper functions
 
@@ -157,7 +161,8 @@ hotkeys = [
     ('Force jump'       , True , ['Alt', 'U'], 'uncondjump.png', uncondjump),
     ('Undo Patch'       , False, ['Alt', 'Z'], None, undo),
     ('Redo Patch'       , False, ['Alt', 'Y'], None, redo),
-    ('Save File'        , False, ['Alt', 'S'], None, savefile)
+    ('Save File'        , False, ['Alt', 'S'], None, savefile),
+    ('Find Code Caves'  , False, ['Alt', 'C'], None, openspelunky)
 ]
 
 
