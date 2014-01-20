@@ -158,7 +158,7 @@ hotkeys = [
     ('Nops all Xrefs'   , True , ['Alt', 'X'], 'nopxrefs.png', nopxrefs),
     ('Assemble'         , True , ['Alt', 'P'], 'assemble.png', assemble),
     ('Toggle jump'      , True , ['Alt', 'J'], 'togglejump.png', togglejump),
-    ('Force jump'       , True , ['Alt', 'U'], 'uncondjump.png', uncondjump),
+    ('Force jump'       , True , ['Ctrl, ''Alt', 'F'], 'uncondjump.png', uncondjump),
     ('Undo Patch'       , False, ['Alt', 'Z'], None, undo),
     ('Redo Patch'       , False, ['Alt', 'Y'], None, redo),
     ('Save File'        , False, ['Alt', 'S'], None, savefile),
