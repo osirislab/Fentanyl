@@ -1,4 +1,9 @@
-from PySide import QtGui, QtCore
+try:
+    from PySide import QtGui, QtCore
+except ImportError:
+    print "PySide unavailable, no CodeCaveFinder"
+    QtCore = None
+    QtGui = None
 import idaapi, idc
 
 class CodeCaveWindow(idaapi.PluginForm):
