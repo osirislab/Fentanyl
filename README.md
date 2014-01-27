@@ -4,6 +4,8 @@
 
 Fentanyl is an IDAPython script that makes patching significantly easier. Fentanyl lets you patch from IDA Pro or Demo easily. Most patches can be done without touching a hex editor but if you must edit raw bytes you can simply use IDA's hex view. You can also undo and redo changes to the idb. 
 
+Fentanyl supercedes other tools for binary patching by being able to assemble with IDA's built in assemblers which can support more than x86 and x86_64. Fentanyl also automates commonly performed patches. One of Fentanyl's best features is that it supports Undo/Redo. We can see changes to the graph live and undo them if they aren't to our liking. 
+
 ## Setup
 
 ### IDAPython
@@ -22,7 +24,7 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
 
 1. `Alt+F7` or `File > Script File` to load scripts
 2. Browse to `main.py` and open it
-3. That's hitlerally it!
+3. That's it!
 
 ### Key Bindings
 
@@ -31,11 +33,13 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
  * `Alt-N` Convert instructions to nops
  * `Alt-X` Nop all xrefs to this function
  * `Alt-J` Invert conditional jump
- * `Alt-U` Make jump unconditional
  * `Alt-P` Patch instruction
  * `Alt-Z` Undo modification (Won't always work. Should still be careful editing.)
  * `Alt-Y` Redo modification (Won't always work. Should still be careful editing.)
  * `Alt-S` Save file
+ * `Alt-C` Find Code Caves
+ * `Ctrl-Alt-F` Make jump unconditional
+ * `Ctrl-Alt-N` Neuter the binary (remove calls to fork, setuid, setgid, getpwnam, setgroups, and chdir)
 
 ## Extras
 
@@ -45,4 +49,4 @@ Check out this [example](https://code.google.com/p/idapython/source/browse/trunk
 
 ### PySide
 
-PySide is a bitch to compile. If you don't want to use the PySide binaries available here, or don't want to compile it yourself, you don't actually need it. Fentanyl will not use the GUI if PySide is not available.
+PySide is annoying to compile. If you don't want to use the PySide binaries available here, or don't want to compile it yourself, you don't actually need it. Fentanyl will not use the GUI if PySide is not available.
