@@ -31,6 +31,8 @@ import Fentanyl
 import AssembleForm
 import FtlHooks
 import CodeCaveFinder
+import Util
+
 
 try:
     from PySide import QtGui
@@ -45,7 +47,6 @@ except ImportError:
 ftl_path = os.path.dirname(__file__)
 
 ftl = Fentanyl.Fentanyl()
-ftl._getpos()
 asf = AssembleForm.AssembleForm()
 ftlh = FtlHooks.FtlHooks()
 ftlh.hook()
@@ -55,16 +56,22 @@ hack = []
 
 #Interfaces to the methods in ftl
 def nopout():
-    start, end = ftl._getpos()
+    start, end = Util.get_pos()
     ftl.nopout(start, end - start)
 
+import traceback
 def assemble():
+    try: assemble_()
+    except e:
+        print traceback.format_exc()
+
+def assemble_():
     success = False
     while not success:
         v = asf.process()
         if not v or not v['inp'].strip(): return
 
-        start, end = ftl._getpos()
+        start, end = Util.get_pos()
         lines = [i.strip() for i in v['inp'].replace(';', '\n').strip().split('\n')]
         success, data = ftl.assemble(start, lines, v['opt_chk']['fixup'], v['opt_chk']['nopout'])
 
@@ -72,15 +79,15 @@ def assemble():
             print data
 
 def togglejump():
-    start, end = ftl._getpos()
+    start, end = Util.get_pos()
     ftl.togglejump(start)
 
 def uncondjump():
-    start, end = ftl._getpos()
+    start, end = Util.get_pos()
     ftl.uncondjump(start)
 
 def nopxrefs():
-    start, end = ftl._getpos()
+    start, end = Util.get_pos()
     func = idaapi.get_func(start)
     if func:
         ftl.nopxrefs(func.startEA)
@@ -97,24 +104,9 @@ def savefile():
     output_file = AskFile(1, "*", "Output File")
     if not output_file:
         return
-    idc.GenerateFile(idaapi.OFILE_DIF, output_file, 0, MaxEA(), 0)
-    diff_file = open(output_file, "rb").read()
-    orig_file = open(idc.GetInputFilePath(), "rb").read()
+    Util.save_file(output_file)
 
-    diff_file = diff_file.split("\n")
-    for line in diff_file:
-        match = re.match("([A-F0-9]+): ([A-F0-9]+) ([A-F0-9]+)", line)
-        if match:
-            groups = match.groups()
-            if orig_file[int(groups[0], 16)] == groups[1].decode('hex'):
-                orig_file = orig_file[:int(groups[0], 16)] + groups[2].decode('hex') + orig_file[int(groups[0], 16)+1:]
-            else:
-                print "Error matching %02x at offset %x..." % (groups[1], groups[0])
-
-    new_file = open(output_file, 'wb')
-    new_file.write(orig_file)
-    new_file.close()
-
+#Interface to spelunky
 def openspelunky():
     window = CodeCaveFinder.CodeCaveWindow()
     window.Show("Spelunky")
@@ -123,7 +115,6 @@ def neuter():
     ftl.neuter()
 
 #Helper functions
-
 def bind_ctx_menus():
     #Find all the menus we need to modify
     menus = []
@@ -154,6 +145,7 @@ def bind_ctx_menus():
 
         for qact in qdata:
             menu.addAction(qact)
+
 
 #Hotkey definitions
 hotkeys = [

@@ -9,6 +9,9 @@ import idaapi
 import idautils
 import idc
 import re
+from Util import *
+
+__all__ = ['Fentanyl']
 
 #Generate a mapping between each set of jumps
 _JUMPS = [
@@ -59,9 +62,9 @@ class Fentanyl(object):
             buf = []
             for data in entries:
                 buf.append(
-                    (data[0], self._readdata(data[0], len(data[1])))
+                    (data[0], read_data(data[0], len(data[1])))
                 )
-                self._writedata(data[0], data[1])
+                write_data(data[0], data[1])
             #Apply to the other stack in reverse order
             wr_f(buf[::-1])
 
@@ -70,31 +73,6 @@ class Fentanyl(object):
             idaapi.jumpto(entries[0][0])
 
         return entries
-
-    def _instrsize(self, ea):
-        """ Get the size of the instr at ea or 1 """
-        instr = idautils.DecodeInstruction(ea)
-        #If invalid, return 1 to consume this byte
-        #XXX: Fixed-width instr sets should add instr size
-        return instr.size if instr else 1
-
-    def _getpos(self):
-        """ Get the selected area """
-        start, end = idc.SelStart(), idc.SelEnd()
-        if start == idc.BADADDR:
-            start = idc.ScreenEA()
-            end = idc.ScreenEA() + self._instrsize(start)
-        return start, end
-
-    def _readdata(self, ea, sz):
-        """ Read bytes from idb """
-        return idaapi.get_many_bytes(ea, sz)
-
-    def _writedata(self, ea, blob, reanalyze=True):
-        """ Write bytes to idb """
-        if reanalyze: idc.MakeUnknown(ea, len(blob), 0)
-        idaapi.patch_many_bytes(ea, blob)
-        if reanalyze: idc.MakeCode(ea)
 
     def _getregvars(self, ea):
         """ Return all the regvar mappings as a dict """
@@ -143,7 +121,7 @@ class Fentanyl(object):
             return success, data
         blob = ''.join(data)
 
-        if len(blob) > self._instrsize(ea):
+        if len(blob) > instr_size(ea):
             if idaapi.askyn_c(0, "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
                 return
 
@@ -156,19 +134,19 @@ class Fentanyl(object):
 
             i = ea
             while i < ea + len(blob):
-                i += self._instrsize(i)
+                i += instr_size(i)
             #Only pad if we trashed the next instruction
             sz_diff = (i - (ea + len(blob))) / len(nop_instr)
             blob += nop_instr * sz_diff
 
         #Write out the data
-        old = self._readdata(ea, len(blob))
+        old = read_data(ea, len(blob))
         if save_state:
             self._pushundo(
                 [(ea, old)]
             )
             self.redo_buffer = []
-        self._writedata(ea, blob)
+        write_data(ea, blob)
         return success, old
 
     def neuter(self):
