@@ -171,6 +171,43 @@ class Fentanyl(object):
         self._writedata(ea, blob)
         return success, old
 
+    def neuter(self):
+        functions = {}
+        for x in idautils.Functions():
+            functions[idc.GetFunctionName(x)] = x
+
+        self.nopxrefs(functions['.alarm'])
+
+        xrefs = idautils.XrefsTo(functions['.fork'])
+        for x in xrefs:
+            self.assemble(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
+
+        xrefs = idautils.XrefsTo(functions['.setuid'])
+        for x in xrefs:
+            setuid = idaapi.get_func(x.frm)
+            ranges = range(setuid.startEA, setuid.endEA)
+
+            getpwnam = idautils.XrefsTo(functions['.getpwnam'])
+            for x in getpwnam:
+                if x.frm in ranges:
+                    self.assemble(x.frm, ['mov eax, 1'])
+            setgroups = idautils.XrefsTo(functions['.setgroups'])
+            for x in setgroups:
+                if x.frm in ranges:
+                    self.assemble(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
+            setgid = idautils.XrefsTo(functions['.setgid'])
+            for x in setgid:
+                if x.frm in ranges:
+                    self.assemble(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
+            setuid = idautils.XrefsTo(functions['.setuid'])
+            for x in setuid:
+                if x.frm in ranges:
+                    self.assemble(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
+            chdir = idautils.XrefsTo(functions['.chdir'])
+            for x in chdir:
+                if x.frm in ranges:
+                    self.assemble(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
+
     def nopout(self, ea, sz):
         """ NOP out a section of memory """
         nsuccess, nop_instr = idautils.Assemble(ea, 'nop')

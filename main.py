@@ -119,6 +119,9 @@ def openspelunky():
     window = CodeCaveFinder.CodeCaveWindow()
     window.Show("Spelunky")
 
+def neuter():
+    ftl.neuter()
+
 #Helper functions
 
 def bind_ctx_menus():
@@ -158,11 +161,12 @@ hotkeys = [
     ('Nops all Xrefs'   , True , ['Alt', 'X'], 'nopxrefs.png', nopxrefs),
     ('Assemble'         , True , ['Alt', 'P'], 'assemble.png', assemble),
     ('Toggle jump'      , True , ['Alt', 'J'], 'togglejump.png', togglejump),
-    ('Force jump'       , True , ['Ctrl, ''Alt', 'F'], 'uncondjump.png', uncondjump),
+    ('Force jump'       , True , ['Ctrl', 'Alt', 'F'], 'uncondjump.png', uncondjump),
     ('Undo Patch'       , False, ['Alt', 'Z'], None, undo),
     ('Redo Patch'       , False, ['Alt', 'Y'], None, redo),
     ('Save File'        , False, ['Alt', 'S'], None, savefile),
-    ('Find Code Caves'  , False, ['Alt', 'C'], None, openspelunky)
+    ('Find Code Caves'  , False, ['Alt', 'C'], None, openspelunky),
+    ('Neuter Binary'    , False, ['Ctrl', 'Alt', 'N'], None, neuter)
 ]
 
 
