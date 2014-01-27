@@ -32,6 +32,7 @@ import AssembleForm
 import FtlHooks
 import CodeCaveFinder
 import Util
+import Neuter
 
 
 try:
@@ -49,6 +50,7 @@ ftl_path = os.path.dirname(__file__)
 ftl = Fentanyl.Fentanyl()
 asf = AssembleForm.AssembleForm()
 ftlh = FtlHooks.FtlHooks()
+ftln = Neuter.Neuter(ftl)
 ftlh.hook()
 
 #XXX: Store the parents of the QWidgets. Otherwise, some get GCed.
