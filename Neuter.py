@@ -12,10 +12,12 @@ class Neuter(object):
             self.functions[idc.GetFunctionName(x)] = x
 
     def nop_xrefs(self, *funcs):
+    	"""Nop out any xref to a function. """
         for x in funcs:
             self.ftl.nopxrefs(self.functions[x])
 
     def replace_with(self, func, replace):
+    	"""Replace an instruction"""
         if type(func) == int or type(func) == long:
             return self.ftl.assemble(func, replace)
         xrefs = idautils.XrefsTo(self.functions[func])
@@ -23,12 +25,14 @@ class Neuter(object):
             return self.ftl.assemble(x.frm, replace)
 
     def in_func(self, func, addr):
+    	"""Check if an instruction is within a function"""
         func = idaapi.get_func(func)
         if addr >= func.startEA and addr <= func.endEA:
             return True
         return False
 
     def auto(self):
+    	"""Automatically patch out annoying functions"""
         self.nop_xrefs('.alarm')
         self.replace_with('.fork', ['xor eax,eax', 'nop', 'nop', 'nop'])
         
