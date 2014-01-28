@@ -24,6 +24,16 @@ class Neuter(object):
         for x in xrefs:
             return self.ftl.assemble(x.frm, replace)
 
+    def find_funcs(self, *funcs):
+        """Find functions that call all funcs"""
+        results = []
+        for func in funcs:
+            xrefs = idautils.XrefsTo(self.functions[func])
+            for xref in xrefs:
+                results.append(idaapi.get_func(xref.frm).startEA)
+        results = list(set(results))
+        return results
+
     def in_func(self, func, addr):
         """Check if an instruction is within a function"""
         func = idaapi.get_func(func)
@@ -36,34 +46,11 @@ class Neuter(object):
         self.nop_xrefs('.alarm')
         self.replace_with('.fork', ['xor eax,eax', 'nop', 'nop', 'nop'])
         
-        setuids = idautils.XrefsTo(self.functions['.setuid']) #get calls to setuid
+        setuids = self.find_funcs('.setuid') #get funcs containing calls to setuid
+
         for setuid in setuids:
-
-            getpwnam = idautils.XrefsTo(self.functions['.getpwnam'])
-            for x in getpwnam:
-                if self.in_func(setuid.frm, x.frm):
-                    self.replace_with(x.frm, ['mov eax, 1'])
-
-            setgroups = idautils.XrefsTo(self.functions['.setgroups'])
-            for x in setgroups:
-                if self.in_func(setuid.frm, x.frm):
-                    self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
-
-            setgid = idautils.XrefsTo(self.functions['.setgid'])
-            for x in setgid:
-                if self.in_func(setuid.frm, x.frm):
-                    self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
-
-            setuid_call = idautils.XrefsTo(self.functions['.setuid'])
-            for x in setuid_call:
-                if self.in_func(setuid.frm, x.frm):
-                    self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
-
-            chdir = idautils.XrefsTo(self.functions['.chdir'])
-            for x in chdir:
-                if self.in_func(setuid.frm, x.frm):
-                    self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop'])
-            
-
-
-
+            getpwnams = [self.replace_with(x.frm, ['mov eax, 1']) for x in idautils.XrefsTo(self.functions['.getpwnam']) if self.in_func(setuid, x.frm)]
+            setgroups = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setgroups']) if self.in_func(setuid, x.frm)]
+            setgids = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setgid']) if self.in_func(setuid, x.frm)]
+            setuids = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setuid']) if self.in_func(setuid, x.frm)]
+            chdirs = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.chdir']) if self.in_func(setuid, x.frm)]
