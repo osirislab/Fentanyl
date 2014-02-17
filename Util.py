@@ -49,6 +49,7 @@ def save_file(output_file):
     for line in diff_file:
         match = DIFF_RE.match(line)
         if match:
+            groups = match.groups()
             total += 1
             offset = int(groups[0], 16)
             orig_byte = groups[1].decode('hex')
