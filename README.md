@@ -6,6 +6,8 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
 
 Fentanyl supercedes other tools for binary patching by being able to assemble with IDA's built in assemblers which can support more than x86 and x86_64. Fentanyl also automates commonly performed patches. One of Fentanyl's best features is that it supports Undo/Redo. We can see changes to the graph live and undo them if they aren't to our liking. 
 
+<img width=75% height=75% src="https://isisblogs.poly.edu/wp-content/uploads/2014/03/assemble2.gif">
+
 ## Setup
 
 ### IDAPython
