@@ -129,9 +129,9 @@ def bind_ctx_menus():
             continue
 
         #Find Hex/IDA Views
-        if  'Hex View' in parent.windowTitle() or \
-            len(parent.windowTitle()) == 1 \
-        :
+        if ('Hex View' in parent.windowTitle() \
+                or 'IDA View' in parent.windowTitle() \
+                or len(parent.windowTitle()) == 1):
             hack.append(parent)
             menus.append(wid)
 
