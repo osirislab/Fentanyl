@@ -17,7 +17,7 @@ Fentanyl supercedes other tools for binary patching by being able to assemble wi
 
 ### IDA PySide
 
- 1. Download (custom built by ancat): Python 2.7 PySide bindings [installer](https://drive.google.com/file/d/0ByZjdUcZD2dnQkw4cHU1bmZzWE0/edit?usp=sharing) or [raw](https://drive.google.com/file/d/0ByZjdUcZD2dndng4Q1hrYWJiSUE/edit?usp=sharing).
+ 1. Download (custom built by ancat): Python 2.7 PySide bindings [installer](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.zip) or [raw](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.exe).
  2. Extract and move PySide folder to `C:\python27\Lib\site-packages\`
 
 ## Usage
