@@ -18,7 +18,7 @@ class CodeCaveWindow(idaapi.PluginForm):
         self.parent = None
 
     def Show(self):
-        idaapi.PluginForm.Show(self, "Spelunky")
+        idaapi.PluginForm.Show(self, "Spelunky", "Test")
         return
 
     def add_entry_to_tree(self, segment, address, size):
