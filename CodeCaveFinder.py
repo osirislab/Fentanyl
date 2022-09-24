@@ -1,5 +1,5 @@
 try:
-    from PySide import QtGui, QtCore
+    from PySide2 import QtWidgets, QtGui, QtCore
 except ImportError:
     print("PySide unavailable, no CodeCaveFinder")
     QtCore = None
@@ -17,7 +17,7 @@ class CodeCaveWindow(idaapi.PluginForm):
         self.parent = None
 
     def add_entry_to_tree(self, segment, address, size):
-        entry = QtGui.QTreeWidgetItem(self.tree)
+        entry = QtWidgets.QTreeWidgetItem(self.tree)
         entry.setText(0, segment)
         entry.setText(1, "0x%x" % address)
         entry.setText(2, ("%d" % size).zfill(10))
@@ -37,18 +37,18 @@ class CodeCaveWindow(idaapi.PluginForm):
 
     def on_create(self, form):
         self.parent = self.FormToPySideWidget(form)
-        self.tree = QtGui.QTreeWidget()
+        self.tree = QtWidgets.QTreeWidget()
         self.tree.setHeaderLabels(("Segment", "Address", "Size"))
         self.tree.setColumnWidth(0, 100)
         self.tree.setSortingEnabled(True)
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.tree)
 
-        jump = QtGui.QPushButton("Jump To")
+        jump = QtWidgets.QPushButton("Jump To")
         jump.clicked.connect(self.jump)
         layout.addWidget(jump)
 
-        search_again = QtGui.QPushButton("Go Spelunking")
+        search_again = QtWidgets.QPushButton("Go Spelunking")
         search_again.clicked.connect(self.populate_tree)
         layout.addWidget(search_again)
 
