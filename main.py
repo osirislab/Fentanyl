@@ -75,7 +75,7 @@ def assemble_():
         start, end = Util.get_pos()
         lines = [i.strip() for i in v['inp'].replace(';', '\n').strip().split('\n')]
         success, data = ftl.assemble(start, lines, v['opt_chk']['fixup'], v['opt_chk']['nopout'])
-
+        print(success, data)
         if not success:
             print(data)
 
