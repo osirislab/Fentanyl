@@ -13,8 +13,7 @@ import idc
 class CodeCaveWindow(idaapi.PluginForm):
 
     def __init__(self):
-        idaapi.PluginForm.__init__(self)
-        self.__clink__ = ida_kernwin.plgform_new()
+        super(CodeCaveWindow, self).__init__()
         self.tree = None
         self.parent = None
 
