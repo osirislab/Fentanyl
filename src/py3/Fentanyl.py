@@ -5,15 +5,13 @@ Main Fentanyl class.
 
 """
 
-import idaapi
 import idautils
-import idc
-import re
-from Util import *
+
+from src.py3.Util import *
 
 __all__ = ['Fentanyl']
 
-#Generate a mapping between each set of jumps
+# Generate a mapping between each set of jumps
 _JUMPS = [
     ('jnb', 'jb'), ('jna', 'ja'),
     ('jnl', 'jl'), ('jng', 'jg'),
@@ -26,13 +24,15 @@ _JUMPS = [
     ('jne', 'je'),
     ('jno', 'jo'),
 ]
-#Generate the opposite mapping as well
+# Generate the opposite mapping as well
 _JUMPS = dict(_JUMPS + [i[::-1] for i in _JUMPS])
+
 
 class Fentanyl(object):
     """ Manages assembling into an IDB and keeping track of undo/redo stacks """
     JUMPS = _JUMPS
     PART_RE = re.compile(r'(\W+)')
+
     def __init__(self):
         """ Initialize our data """
         self.undo_buffer = []
@@ -65,10 +65,10 @@ class Fentanyl(object):
                     (data[0], read_data(data[0], len(data[1])))
                 )
                 write_data(data[0], data[1])
-            #Apply to the other stack in reverse order
+            # Apply to the other stack in reverse order
             wr_f(buf[::-1])
 
-        #Jump to the first entry if an operation was performed
+        # Jump to the first entry if an operation was performed
         if entries:
             idaapi.jumpto(entries[0][0])
 
@@ -79,10 +79,10 @@ class Fentanyl(object):
         func = idaapi.get_func(ea)
         regvars = {}
 
-        #XXX: Broken in idapython
-        #mapping = {rv.user: rv.canon for rv in func.regvars}
+        # XXX: Broken in idapython
+        # mapping = {rv.user: rv.canon for rv in func.regvars}
 
-        #Check if each regvar exists and add it to the dict
+        # Check if each regvar exists and add it to the dict
         regs = ['eax', 'ebx', 'ecx', 'edx', 'esi', 'edi', 'esp', 'ebp']
         for r in regs:
             rv = idaapi.find_regvar(func, ea, r)
@@ -95,19 +95,21 @@ class Fentanyl(object):
         """ Fixup an instruction """
         nparts = []
         for i in parts:
-            #Fixup regvars
-            if i in regvars: nparts.append(regvars[i])
-            #Fixup .got.plt entries (IDA turns '.' into '_')
+            # Fixup regvars
+            if i in regvars:
+                nparts.append(regvars[i])
+            # Fixup .got.plt entries (IDA turns '.' into '_')
             elif i and i[0] == '_':
                 nparts.append(i.replace('_', '.', 1))
-            #Default case
-            else: nparts.append(i)
+            # Default case
+            else:
+                nparts.append(i)
 
         return ''.join(nparts)
 
     def assemble(self, ea, asm, save_state=True, opt_fix=True, opt_nop=True):
         """ Assemble into memory """
-        #Fixup the assemble
+        # Fixup the assemble
         if opt_fix:
             regvars = self._getregvars(ea)
             parts_arr = [self.PART_RE.split(i) for i in asm]
@@ -115,18 +117,22 @@ class Fentanyl(object):
             for parts in parts_arr:
                 asm.append(self._fixup(parts, regvars))
 
-        #Assemble to a string
+        # Assemble to a string
         success, data = idautils.Assemble(ea, asm)
         if not success:
             return success, data
-        blob = ''.join(data)
 
+        # TODO Fix length finding
+        if isinstance(data, list):
+            blob = b''.join(data)
+        else:
+            blob = data
+        print(blob)
         if len(blob) > instr_size(ea):
-            if idaapi.askyn_c(0, "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
+            if idaapi.ask_yn(0, "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
                 return
 
-
-        #Pad the blob with nops
+        # Pad the blob with nops
         if opt_nop:
             nsuccess, nop_instr = idautils.Assemble(ea, 'nop')
             if not nsuccess:
@@ -135,17 +141,19 @@ class Fentanyl(object):
             i = ea
             while i < ea + len(blob):
                 i += instr_size(i)
-            #Only pad if we trashed the next instruction
-            sz_diff = (i - (ea + len(blob))) / len(nop_instr)
-            blob += nop_instr * sz_diff
+            # Only pad if we trashed the next instruction
+            sz_diff = int((i - (ea + len(blob))) / len(nop_instr))
+            if sz_diff > 0:
+                blob += nop_instr * sz_diff
 
-        #Write out the data
+        # Write out the data
         old = read_data(ea, len(blob))
         if save_state:
             self._pushundo(
                 [(ea, old)]
             )
             self.redo_buffer = []
+        print(blob)
         write_data(ea, blob)
         return success, old
 
@@ -154,7 +162,7 @@ class Fentanyl(object):
         nsuccess, nop_instr = idautils.Assemble(ea, 'nop')
         if not nsuccess:
             return nsuccess, nop_instr
-        return self.assemble(ea, ['nop'] * (sz / len(nop_instr)))
+        return self.assemble(ea, ['nop'] * int(sz / len(nop_instr)))
 
     def nopxrefs(self, ea):
         """ Nop out all xrefs to a function """
@@ -183,20 +191,21 @@ class Fentanyl(object):
         """ Make a jump unconditional """
         inst = idautils.DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
-        if mnem not in self.JUMPS: return False
+        if mnem not in self.JUMPS:
+            return False
         return self.assemble(ea, [idc.GetDisasm(ea).replace(mnem, 'jmp')])
 
     def undo(self, n=1):
         """ Undo modifications """
-        return self._statedo(n, self._popundo, self._pushredo);
+        return self._statedo(n, self._popundo, self._pushredo)
 
     def redo(self, n=1):
         """ Redo modifications """
-        return self._statedo(n, self._popredo, self._pushundo);
+        return self._statedo(n, self._popredo, self._pushundo)
 
     def clear(self):
         """ Clear our state """
         self.redo_buffer = []
         self.undo_buffer = []
 
-#print DecodeInstruction
+# print(DecodeInstruction)

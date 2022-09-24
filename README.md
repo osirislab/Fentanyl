@@ -8,8 +8,27 @@ Fentanyl supercedes other tools for binary patching by being able to assemble wi
 
 <img width=75% height=75% src="http://blog.isis.poly.edu/images/2014/03/assemble2.gif">
 
-## Setup
+## Setup (IDA 7.x / Python 3)
 
+Simply move all items from this repository into the following directory:
+
+```
+%IDA%\plugins
+```
+
+The `%IDA%` directory can usually be found bellow:
+
+```
+C:\Program Files\IDA <version>\
+```
+
+Now on program start, the plugin will be loaded automatically.
+
+## Setup (IDA 6.x / Python 2)
+
+```
+Need to add backwards compatibility with IDA 6.x / Python2 or mark as deprecated.
+```
 ### IDAPython
 
  1. Download IDAPython [here](https://code.google.com/p/idapython/).
@@ -24,6 +43,11 @@ Fentanyl supercedes other tools for binary patching by being able to assemble wi
 
 ### Loading Fentanyl.py
 
+#### IDA 7.x / Python 3
+
+Follow instructions under Setup.
+
+#### IDA 6.x / Python 2
 1. `Alt+F7` or `File > Script File` to load scripts
 2. Browse to `main.py` and open it
 3. That's it!
@@ -32,14 +56,14 @@ Fentanyl supercedes other tools for binary patching by being able to assemble wi
 
 *Some of these keybindings can be accessed by right-clicking on the screen in graph view.*
 
- * `Alt-N` Convert instructions to nops
- * `Alt-X` Nop all xrefs to this function
- * `Alt-J` Invert conditional jump
- * `Alt-P` Patch instruction
+ * `Ctrl-Alt-N` Convert instructions to nops
+ * `Ctrl-Alt-X` Nop all xrefs to this function
+ * `Ctrl-Alt-J` Invert conditional jump
+ * `Ctrl-Alt-P` Patch instruction
  * `Alt-Z` Undo modification (Won't always work. Should still be careful editing.)
  * `Alt-Y` Redo modification (Won't always work. Should still be careful editing.)
- * `Alt-S` Save file
- * `Alt-C` Find Code Caves
+ * `Ctrl-Alt-S` Save file
+ * `Ctrl-Alt-C` Find Code Caves
  * `Ctrl-Alt-F` Make jump unconditional
  * `Ctrl-Alt-N` Neuter the binary (remove calls to fork, setuid, setgid, getpwnam, setgroups, and chdir)
 
