@@ -13,14 +13,9 @@ import idc
 class CodeCaveWindow(idaapi.PluginForm):
 
     def __init__(self):
-        idaapi.PluginForm.__init__(self)
-        self.__clink__ = idaapi.plgform_new()
+        super(CodeCaveWindow, self).__init__()
         self.tree = None
         self.parent = None
-
-    def Show(self):
-        idaapi.PluginForm.Show(self, "Spelunky")
-        return
 
     def add_entry_to_tree(self, segment, address, size):
         entry = QtWidgets.QTreeWidgetItem(self.tree)
