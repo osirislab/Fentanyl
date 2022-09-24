@@ -5,9 +5,9 @@ Main Fentanyl class.
 
 """
 
-import idaapi
 import idautils
-import idc
+
+from Neuter import Neuter
 from Util import *
 
 __all__ = ['Fentanyl']
@@ -122,12 +122,15 @@ class Fentanyl(object):
         success, data = idautils.Assemble(ea, asm)
         if not success:
             return success, data
-        print(data)
-        blob = ''.join([str(d) for d in data])
 
+        # TODO Fix length finding
+        if isinstance(data, list):
+            blob = b''.join(data)
+        else:
+            blob = data
+        print(blob)
         if len(blob) > instr_size(ea):
-            if idaapi.askyn_c(0,
-                              "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
+            if idaapi.ask_yn(0, "The assembled instruction is bigger than the current instruction. This will clobber following instructions. Continue?") != 1:
                 return
 
         # Pad the blob with nops
@@ -140,8 +143,9 @@ class Fentanyl(object):
             while i < ea + len(blob):
                 i += instr_size(i)
             # Only pad if we trashed the next instruction
-            sz_diff = (i - (ea + len(blob))) / len(nop_instr)
-            blob += nop_instr * sz_diff
+            sz_diff = int((i - (ea + len(blob))) / len(nop_instr))
+            if sz_diff > 0:
+                blob += nop_instr * sz_diff
 
         # Write out the data
         old = read_data(ea, len(blob))
@@ -150,6 +154,7 @@ class Fentanyl(object):
                 [(ea, old)]
             )
             self.redo_buffer = []
+        print(blob)
         write_data(ea, blob)
         return success, old
 
@@ -158,7 +163,7 @@ class Fentanyl(object):
         nsuccess, nop_instr = idautils.Assemble(ea, 'nop')
         if not nsuccess:
             return nsuccess, nop_instr
-        return self.assemble(ea, ['nop'] * (sz / len(nop_instr)))
+        return self.assemble(ea, ['nop'] * int(sz / len(nop_instr)))
 
     def nopxrefs(self, ea):
         """ Nop out all xrefs to a function """
@@ -187,16 +192,17 @@ class Fentanyl(object):
         """ Make a jump unconditional """
         inst = idautils.DecodeInstruction(ea)
         mnem = inst.get_canon_mnem()
-        if mnem not in self.JUMPS: return False
+        if mnem not in self.JUMPS:
+            return False
         return self.assemble(ea, [idc.GetDisasm(ea).replace(mnem, 'jmp')])
 
     def undo(self, n=1):
         """ Undo modifications """
-        return self._statedo(n, self._popundo, self._pushredo);
+        return self._statedo(n, self._popundo, self._pushredo)
 
     def redo(self, n=1):
         """ Redo modifications """
-        return self._statedo(n, self._popredo, self._pushundo);
+        return self._statedo(n, self._popredo, self._pushundo)
 
     def clear(self):
         """ Clear our state """

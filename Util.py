@@ -7,16 +7,17 @@ Various helper functions
 
 import re
 import idc
-import idautils
+import ida_ua
 import idaapi
+import ida_bytes
+import ida_ida
 
 
 def instr_size(ea):
     """ Get the size of the instr at ea or 1 """
-    instr = idautils.DecodeInstruction(ea)
-    # If invalid, return 1 to consume this byte
-    # XXX: Fixed-width instr sets should add instr size
-    return instr.size if instr else 1
+    insn = ida_ua.insn_t()
+    instr = ida_ua.decode_insn(insn, ea)
+    return instr if instr else 1
 
 
 def get_pos():
@@ -30,23 +31,23 @@ def get_pos():
 
 def read_data(ea, sz):
     """ Read bytes from idb """
-    return idaapi.get_many_bytes(ea, sz)
+    return idaapi.get_bytes(ea, sz)
 
 
 def write_data(ea, blob, reanalyze=True):
     """ Write bytes to idb """
     if reanalyze:
-        idc.MakeUnknown(ea, len(blob), 0)
-    idaapi.patch_many_bytes(ea, blob)
+        idc.del_items(ea, len(blob), 0)
+    ida_bytes.patch_bytes(ea, blob)
     if reanalyze:
-        idc.MakeCode(ea)
+        idc.create_insn(ea)
 
 
 def save_file(output_file):
     """ Save the patched file """
     DIFF_RE = re.compile(r'([A-F0-9]+): ([A-F0-9]+) ([A-F0-9]+)')
 
-    idc.GenerateFile(idaapi.OFILE_DIF, output_file, 0, idc.inf_get_max_ea(), 0)
+    idc.gen_file(idaapi.OFILE_DIF, output_file, 0, ida_ida.inf_get_max_ea(), 0)
     diff_file = open(output_file, "rb").read()
     orig_file = open(idc.get_input_file_path(), "rb").read()
     print("OK")
@@ -59,13 +60,13 @@ def save_file(output_file):
             groups = match.groups()
             total += 1
             offset = int(groups[0], 16)
-            orig_byte = groups[1].decode('hex')
-            new_byte = groups[2].decode('hex')
-            if orig_file[offset] == orig_byte:
+            orig_byte = bytes.fromhex(groups[1])
+            new_byte = bytes.fromhex(groups[2])
+            if orig_file[offset] == orig_byte[0]:
                 orig_file = orig_file[:offset] + new_byte + orig_file[offset + 1:]
                 success += 1
             else:
-                print("Error matching %02x at offset %x..." % (groups[1], offset))
+                print(f"Error matching {groups[1]} at offset %x..." % offset)
 
     new_file = open(output_file, 'wb')
     new_file.write(orig_file)
