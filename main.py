@@ -177,9 +177,8 @@ if QtCore:
 
     qdata = []
     for name, in_menu, keys, icon, func in (i for i in hotkeys if i[1]):
-        qact = QtWidgets.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
-        qact.triggered.connect(func)
-
+        qact = QtGui.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
+        qact.trigger = func
         qks = QtGui.QKeySequence('+'.join(keys))
         qact.setShortcut(qks)
         qdata.append(qact)
