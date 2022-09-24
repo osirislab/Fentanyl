@@ -22,7 +22,7 @@ The `%IDA%` directory can usually be found bellow:
 C:\Program Files\IDA <version>\
 ```
 
-Now on boot, the plugin will be loaded automatically.
+Now on program start, the plugin will be loaded automatically.
 
 ## Setup (IDA 6.x / Python 2)
 
