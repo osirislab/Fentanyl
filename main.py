@@ -117,7 +117,7 @@ def savefile():
 # Interface to spelunky
 def openspelunky():
     window = CodeCaveFinder.CodeCaveWindow()
-    window.Show()
+    window.Show("Spelunky")
 
 
 def neuter():
