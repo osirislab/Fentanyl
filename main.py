@@ -31,7 +31,7 @@ import CodeCaveFinder
 import Util
 import Neuter
 try:
-    from PySide6 import QtGui, QtWidgets, QtCore
+    from PyQt5 import QtGui, QtWidgets, QtCore
 except ImportError:
     print("PySide unavailable, no GUI")
     QtCore = None
