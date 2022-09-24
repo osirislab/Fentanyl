@@ -21,10 +21,10 @@ def instr_size(ea):
 
 def get_pos():
     """ Get the selected area """
-    start, end = idc.SelStart(), idc.SelEnd()
+    start, end = idc.read_selection_start(), idc.read_selection_end()
     if start == idc.BADADDR:
-        start = idc.ScreenEA()
-        end = idc.ScreenEA() + instr_size(start)
+        start = idc.get_screen_ea()
+        end = idc.get_screen_ea() + instr_size(start)
     return start, end
 
 
@@ -46,9 +46,9 @@ def save_file(output_file):
     """ Save the patched file """
     DIFF_RE = re.compile(r'([A-F0-9]+): ([A-F0-9]+) ([A-F0-9]+)')
 
-    idc.GenerateFile(idaapi.OFILE_DIF, output_file, 0, idc.MaxEA(), 0)
+    idc.GenerateFile(idaapi.OFILE_DIF, output_file, 0, idc.inf_get_max_ea(), 0)
     diff_file = open(output_file, "rb").read()
-    orig_file = open(idc.GetInputFilePath(), "rb").read()
+    orig_file = open(idc.get_input_file_path(), "rb").read()
     print("OK")
     diff_file = diff_file.split(b"\n")
     total = 0

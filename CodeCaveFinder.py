@@ -10,7 +10,7 @@ import ida_kernwin
 import idc
 
 
-class CodeCaveWindow(idaapi.PluginForm):
+class CodeCaveWindow(ida_kernwin.PluginForm):
 
     def __init__(self):
         self.tree = None
