@@ -1,7 +1,5 @@
 try:
-    from PySide6 import QtGui
-    from PySide6 import QtWidgets
-    from PySide6 import QtCore
+    from PySide2 import QtWidgets, QtGui, QtCore
 except ImportError:
     print("PySide unavailable, no CodeCaveFinder")
     QtCore = None

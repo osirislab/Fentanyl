@@ -31,9 +31,7 @@ import CodeCaveFinder
 import Util
 import Neuter
 try:
-    from PySide6 import QtGui
-    from PySide6 import QtWidgets
-    from PySide6 import QtCore
+    from PySide2 import QtGui, QtWidgets, QtCore
 except ImportError:
     print("PySide unavailable, no GUI")
     QtCore = None
@@ -177,8 +175,9 @@ if QtCore:
 
     qdata = []
     for name, in_menu, keys, icon, func in (i for i in hotkeys if i[1]):
-        qact = QtGui.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
+        qact = QtWidgets.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
         qact.triggered.connect(func)
+
         qks = QtGui.QKeySequence('+'.join(keys))
         qact.setShortcut(qks)
         qdata.append(qact)
