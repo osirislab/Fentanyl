@@ -30,10 +30,9 @@ import FtlHooks
 import CodeCaveFinder
 import Util
 import Neuter
-
+from PySide2 import QtGui, QtWidgets, QtCore
 try:
-    from PySide import QtGui
-    from PySide import QtCore
+    pass
 except ImportError:
     print("PySide unavailable, no GUI")
     QtCore = None
@@ -131,11 +130,11 @@ def bind_ctx_menus():
     # Find all the menus we need to modify
     menus = []
     for wid in qta.allWidgets():
-        if not isinstance(wid, QtGui.QMenu):
+        if not isinstance(wid, QtWidgets.QMenu):
             continue
 
         parent = wid.parent()
-        if parent.__class__ != QtGui.QWidget:
+        if parent.__class__ != QtWidgets.QWidget:
             continue
 
         # Find Hex/IDA Views
@@ -177,7 +176,7 @@ if QtCore:
 
     qdata = []
     for name, in_menu, keys, icon, func in (i for i in hotkeys if i[1]):
-        qact = QtGui.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
+        qact = QtWidgets.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
         qact.triggered.connect(func)
 
         qks = QtGui.QKeySequence('+'.join(keys))
