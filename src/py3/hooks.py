@@ -1,12 +1,13 @@
 import ida_kernwin
 import idaapi
 
-import AssembleForm
-import CodeCaveFinder
-import Neuter
-import Util
-import Fentanyl
+import src.py3.AssembleForm as AssembleForm
+import src.py3.CodeCaveFinder as CodeCaveFinder
+import src.py3.Neuter as Neuter
+import src.py3.Util as Util
+import src.py3.Fentanyl as Fentanyl
 import traceback
+import os
 
 ftl = Fentanyl.Fentanyl()
 asf = AssembleForm.AssembleForm()
@@ -115,8 +116,8 @@ def plugin_resource(resource_name):
     Return the full path for a given plugin resource file.
     """
     return os.path.join(
-        os.path.abspath(ftl_path),
-        "icons",
+        os.path.abspath(os.path.dirname(__file__)),
+        "../icons",
         resource_name
     )
 

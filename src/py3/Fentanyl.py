@@ -7,8 +7,7 @@ Main Fentanyl class.
 
 import idautils
 
-from Neuter import Neuter
-from Util import *
+from src.py3.Util import *
 
 __all__ = ['Fentanyl']
 
