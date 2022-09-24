@@ -7,6 +7,7 @@ Hooks to process various events.
 
 import idaapi
 
+
 class FtlHooks(idaapi.UI_Hooks):
     def __init__(self):
         super(FtlHooks, self).__init__()

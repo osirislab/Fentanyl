@@ -1,16 +1,18 @@
 try:
     from PySide import QtGui, QtCore
 except ImportError:
-    print "PySide unavailable, no CodeCaveFinder"
+    print("PySide unavailable, no CodeCaveFinder")
     QtCore = None
     QtGui = None
+
 import idaapi, idc
+
 
 class CodeCaveWindow(idaapi.PluginForm):
     def findCodeCavez(self, segment=".text"):
         start = idc.SegByBase(idc.SegByName(segment))
         if start == idc.BADADDR:
-            print "Can't find segment %s" % (segment)
+            print("Can't find segment %s" % (segment))
             return
 
         end = idc.SegEnd(start)
@@ -32,18 +34,21 @@ class CodeCaveWindow(idaapi.PluginForm):
             results.append((new_addr, curr_size))
 
         return results
-        return biggest_addr, biggest_size
+        # Return never touched
+        # return biggest_addr, biggest_size
 
     def addEntryToTree(self, segment, address, size):
         entry = QtGui.QTreeWidgetItem(self.tree)
         entry.setText(0, segment)
-        entry.setText(1, "0x%x"%(address))
-        entry.setText(2, ("%d"%(size)).zfill(10))
+        entry.setText(1, "0x%x" % (address))
+        entry.setText(2, ("%d" % (size)).zfill(10))
         # print dir(entry)
 
     def PopulateTree(self):
         self.tree.clear()
-        executable_segments = [(idc.SegName(idaapi.getnseg(x).startEA), 0!=(idaapi.getnseg(x).perm & idaapi.SEGPERM_EXEC)) for x in range(idaapi.get_segm_qty())]
+        executable_segments = [
+            (idc.SegName(idaapi.getnseg(x).startEA), 0 != (idaapi.getnseg(x).perm & idaapi.SEGPERM_EXEC)) for x in
+            range(idaapi.get_segm_qty())]
         for segment in executable_segments:
             if not segment[1]:
                 continue
@@ -54,7 +59,7 @@ class CodeCaveWindow(idaapi.PluginForm):
     def OnCreate(self, form):
         self.parent = self.FormToPySideWidget(form)
         self.tree = QtGui.QTreeWidget()
-        self.tree.setHeaderLabels(("Segment","Address","Size"))
+        self.tree.setHeaderLabels(("Segment", "Address", "Size"))
         self.tree.setColumnWidth(0, 100)
         self.tree.setSortingEnabled(True)
         layout = QtGui.QVBoxLayout()

@@ -4,6 +4,7 @@ import idc
 import re
 from Util import *
 
+
 class Neuter(object):
     def __init__(self, ftl):
         self.ftl = ftl
@@ -37,20 +38,22 @@ class Neuter(object):
     def in_func(self, func, addr):
         """Check if an instruction is within a function"""
         func = idaapi.get_func(func)
-        if addr >= func.startEA and addr <= func.endEA:
+        if func.startEA <= addr <= func.endEA:
             return True
         return False
 
     def auto(self):
         """Automatically patch out annoying functions"""
+        nop = ['xor eax,eax', 'nop', 'nop', 'nop']
         self.nop_xrefs('.alarm')
-        self.replace_with('.fork', ['xor eax,eax', 'nop', 'nop', 'nop'])
-        
-        setuids = self.find_funcs('.setuid') #get funcs containing calls to setuid
+        self.replace_with('.fork', nop)
+
+        # get funcs containing calls to setuid
+        setuids = self.find_funcs('.setuid')
 
         for setuid in setuids:
-            getpwnams = [self.replace_with(x.frm, ['mov eax, 1']) for x in idautils.XrefsTo(self.functions['.getpwnam']) if self.in_func(setuid, x.frm)]
-            setgroups = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setgroups']) if self.in_func(setuid, x.frm)]
-            setgids = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setgid']) if self.in_func(setuid, x.frm)]
-            setuids = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.setuid']) if self.in_func(setuid, x.frm)]
-            chdirs = [self.replace_with(x.frm, ['xor eax,eax', 'nop', 'nop', 'nop']) for x in idautils.XrefsTo(self.functions['.chdir']) if self.in_func(setuid, x.frm)]
+            _functions = [('.getpwnam', ['mov eax, 1']), ('.setgroups', nop), ('.setgid', nop), ('.setuid', nop), ('.chdir', nop)]
+            for _sub_x in _functions:
+                for x in idautils.XrefsTo(self.functions[_sub_x[0]]):
+                    if self.in_func(setuid, x.frm):
+                        self.replace_with(x.frm, _sub_x[1])
