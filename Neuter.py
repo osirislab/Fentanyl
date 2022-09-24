@@ -1,8 +1,6 @@
 import idaapi
 import idautils
 import idc
-import re
-from Util import *
 
 
 class Neuter(object):
@@ -10,7 +8,7 @@ class Neuter(object):
         self.ftl = ftl
         self.functions = {}
         for x in idautils.Functions():
-            self.functions[idc.GetFunctionName(x)] = x
+            self.functions[idc.get_func_name(x)] = x
 
     def nop_xrefs(self, *funcs):
         """Nop out any xref to a function. """

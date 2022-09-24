@@ -8,7 +8,6 @@ Main Fentanyl class.
 import idaapi
 import idautils
 import idc
-import re
 from Util import *
 
 __all__ = ['Fentanyl']

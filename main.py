@@ -24,9 +24,6 @@ Keybindings:
 
 import os
 import idaapi
-import idc
-import re
-
 import Fentanyl
 import AssembleForm
 import FtlHooks
