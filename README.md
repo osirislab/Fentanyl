@@ -27,7 +27,7 @@ Now on boot, the plugin will be loaded automatically.
 ## Setup (IDA 6.x / Python 2)
 
 ```
-Need to add backwards compatibility with IDA 6.x
+Need to add backwards compatibility with IDA 6.x or mark as deprecated
 ```
 ### IDAPython
 
