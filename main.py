@@ -62,7 +62,7 @@ import traceback
 def assemble():
     try:
         assemble_()
-    except e:
+    except:
         print(traceback.format_exc())
 
 
@@ -175,7 +175,7 @@ if QtCore:
 
     qdata = []
     for name, in_menu, keys, icon, func in (i for i in hotkeys if i[1]):
-        qact = QtGui.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
+        qact = QtWidgets.QAction(QtGui.QIcon(os.path.join(ftl_path, 'icons', icon)), name, qta)
         qact.triggered.connect(func)
 
         qks = QtGui.QKeySequence('+'.join(keys))

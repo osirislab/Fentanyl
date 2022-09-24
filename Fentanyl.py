@@ -122,7 +122,8 @@ class Fentanyl(object):
         success, data = idautils.Assemble(ea, asm)
         if not success:
             return success, data
-        blob = ''.join(data)
+        print(data)
+        blob = ''.join([str(d) for d in data])
 
         if len(blob) > instr_size(ea):
             if idaapi.askyn_c(0,
