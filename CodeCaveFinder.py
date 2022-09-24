@@ -14,6 +14,7 @@ class CodeCaveWindow(idaapi.PluginForm):
 
     def __init__(self):
         idaapi.PluginForm.__init__(self)
+        self.__clink__ = idaapi.plgform_new()
         self.tree = None
         self.parent = None
 
