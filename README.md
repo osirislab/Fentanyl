@@ -6,7 +6,15 @@ Fentanyl is an IDAPython script that makes patching significantly easier. Fentan
 
 Fentanyl supercedes other tools for binary patching by being able to assemble with IDA's built in assemblers which can support more than x86 and x86_64. Fentanyl also automates commonly performed patches. One of Fentanyl's best features is that it supports Undo/Redo. We can see changes to the graph live and undo them if they aren't to our liking. 
 
-<img width=75% height=75% src="http://blog.isis.poly.edu/images/2014/03/assemble2.gif">
+## Examples
+
+### Xref Noping
+
+<img width=75% height=75% src="https://blog.osiris.cyber.nyu.edu/images/2014/03/nopxrefs2.gif">
+
+### Patching
+
+<img width=75% height=75% src="https://blog.osiris.cyber.nyu.edu/images/2014/03/assemble2.gif">
 
 ## Setup (IDA 7.x / Python 3)
 
@@ -22,13 +30,19 @@ The `%IDA%` directory can usually be found bellow:
 C:\Program Files\IDA <version>\
 ```
 
+### Example Instructions
+
+```
+cd C:\Program Files\IDA <version>\plugins
+git clone https://github.com/osirislab/Fentanyl.git
+move Fentanyl\* .
+```
+
 Now on program start, the plugin will be loaded automatically.
 
 ## Setup (IDA 6.x / Python 2)
 
-```
-Need to add backwards compatibility with IDA 6.x / Python2 or mark as deprecated.
-```
+Download the release for IDA 6.x and Python2 from the repo and unarchive it.
 ### IDAPython
 
  1. Download IDAPython [here](https://code.google.com/p/idapython/).
@@ -36,7 +50,7 @@ Need to add backwards compatibility with IDA 6.x / Python2 or mark as deprecated
 
 ### IDA PySide
 
- 1. Download (custom built by ancat): Python 2.7 PySide bindings [installer](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.zip) or [raw](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.exe).
+ 1. Download (custom built by ancat): Python 2.7 PySide bindings (found in the IDA 6.x / Python2 release package).
  2. Extract and move PySide folder to `C:\python27\Lib\site-packages\`
 
 ## Usage
