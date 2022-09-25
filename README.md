@@ -42,9 +42,7 @@ Now on program start, the plugin will be loaded automatically.
 
 ## Setup (IDA 6.x / Python 2)
 
-```
-Need to add backwards compatibility with IDA 6.x / Python2 or mark as deprecated.
-```
+Download the release for IDA 6.x and Python2 from the repo and unarchive it.
 ### IDAPython
 
  1. Download IDAPython [here](https://code.google.com/p/idapython/).
@@ -52,7 +50,7 @@ Need to add backwards compatibility with IDA 6.x / Python2 or mark as deprecated
 
 ### IDA PySide
 
- 1. Download (custom built by ancat): Python 2.7 PySide bindings [installer](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.zip) or [raw](https://github.com/osirislab/Fentanyl/tree/master/pyside/PySide.exe).
+ 1. Download (custom built by ancat): Python 2.7 PySide bindings (found in the IDA 6.x / Python2 release package).
  2. Extract and move PySide folder to `C:\python27\Lib\site-packages\`
 
 ## Usage
