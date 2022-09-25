@@ -1,11 +1,11 @@
 import ida_kernwin
 import idaapi
 
-import src.py3.AssembleForm as AssembleForm
-import src.py3.CodeCaveFinder as CodeCaveFinder
-import src.py3.Neuter as Neuter
-import src.py3.Util as Util
-import src.py3.Fentanyl as Fentanyl
+import fentanyl_src.py3.AssembleForm as AssembleForm
+import fentanyl_src.py3.CodeCaveFinder as CodeCaveFinder
+import fentanyl_src.py3.Neuter as Neuter
+import fentanyl_src.py3.Util as Util
+import fentanyl_src.py3.Fentanyl as Fentanyl
 import traceback
 import os
 

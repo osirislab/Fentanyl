@@ -3,7 +3,7 @@ PLUGIN_NAME = "Fentanyl"
 VERSION = '2.0'
 
 import idaapi
-import src.py3.hooks as hooks
+import fentanyl_src.py3.hooks as hooks
 
 major, minor = map(int, idaapi.get_kernel_version().split("."))
 using_ida7api = (major > 6)
