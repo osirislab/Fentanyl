@@ -195,7 +195,7 @@ HOOKS = [
         'prefix': 'prefix:neuter',
         'title': 'Neuter Binary',
         'hook': IDACtxEntry(neuter),
-        'hotkey': 'Ctrl+Alt+N',
+        'hotkey': 'Alt+N',
         'desc': 'Neuter the binary (remove calls to fork, setuid, setgid, getpwnam, setgroups, and chdir).'
     }
 ]
