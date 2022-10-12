@@ -65,7 +65,7 @@ Follow instructions under Setup.
  * `Ctrl-Alt-S` Save file
  * `Ctrl-Alt-C` Find Code Caves
  * `Ctrl-Alt-F` Make jump unconditional
- * `Ctrl-Alt-N` Neuter the binary (remove calls to fork, setuid, setgid, getpwnam, setgroups, and chdir)
+ * `Alt-N` Neuter the binary (remove calls to fork, setuid, setgid, getpwnam, setgroups, and chdir)
 
 ## Extras
 
